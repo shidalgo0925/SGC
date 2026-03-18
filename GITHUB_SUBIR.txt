@@ -1,0 +1,32 @@
+=== Subir SGC a GitHub y clonar en el srv ===
+
+1) Crear repo en GitHub (web)
+   - Nuevo repositorio → nombre ej. relatic-sgc → PRIVADO
+   - Sin README si ya tienes carpeta local
+
+2) En tu PC, dentro de la carpeta SGC:
+
+   git init
+   git add .
+   git status
+   # Revisa que NO aparezcan: .venv, *.xlsx, PDFs en output/, certificado en base/
+
+   git commit -m "SGC: generación masiva certificados"
+   git branch -M main
+   git remote add origin https://github.com/TU_ORG/relatic-sgc.git
+   git push -u origin main
+
+3) En el servidor (después)
+
+   git clone https://github.com/TU_ORG/relatic-sgc.git SGC
+   cd SGC
+   bash script/setup_srv.sh
+   # O: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+4) Datos que NO vienen del git (copiarlos aparte al srv)
+   - Carpeta hermana SGC_Base: Certificado.pdf + excel de datos peru.xlsx
+   - O subir por scp/sftp solo cuando vayas a emitir
+
+5) Token / SSH
+   - HTTPS: GitHub pide Personal Access Token como contraseña
+   - O configura SSH y usa git@github.com:ORG/repo.git

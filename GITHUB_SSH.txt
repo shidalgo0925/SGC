@@ -1,0 +1,40 @@
+=== SSH para GitHub (repo SGC) ===
+Repo: git@github.com:shidalgo0925/SGC.git
+
+1) CREAR LLAVE (Git Bash o PowerShell)
+
+   Git Bash:
+     ssh-keygen -t ed25519 -C "tu-correo@ejemplo.com" -f ~/.ssh/id_ed25519_github
+     (Enter a passphrase: opcional pero recomendado)
+
+2) ARRANCAR AGENTE Y AÑADIR LLAVE (Git Bash)
+
+     eval "$(ssh-agent -s)"
+     ssh-add ~/.ssh/id_ed25519_github
+
+3) COPIAR LA PÚBLICA al portapapeles
+   - Git Bash:  cat ~/.ssh/id_ed25519_github.pub | clip
+   - O abre el archivo .pub con el bloc de notas y copia TODO en una línea.
+
+4) EN GITHUB (web)
+   Settings → SSH and GPG keys → New SSH key
+   Pega el contenido de id_ed25519_github.pub → Save.
+
+5) PROBAR
+     ssh -T git@github.com
+   Debe decir: Hi shidalgo0925! ...
+
+6) SUBIR EL REPO (primera vez, carpeta SGC)
+     git init
+     git add .
+     git commit -m "Initial SGC"
+     git branch -M main
+     git remote add origin git@github.com:shidalgo0925/SGC.git
+     git push -u origin main
+
+7) Si ya tenías remote HTTPS, cámbialo:
+     git remote set-url origin git@github.com:shidalgo0925/SGC.git
+
+8) Windows: si ssh-add falla, usa "Git Credential Manager" o inicia el servicio ssh-agent.
+
+NUNCA subas el archivo SIN .pub (la privada) a Git ni lo pegues en ningún sitio.

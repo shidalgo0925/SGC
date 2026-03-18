@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# PDFs generados
+output/**/*.pdf
+
+# Datos personales (no subir listas)
+data/*.xlsx
+data/*.xls
+data/*.XLSX
+
+# Plantilla oficial (sustituir en cada entorno; opcional quitar esta línea si quieren versionarla)
+base/*.pdf

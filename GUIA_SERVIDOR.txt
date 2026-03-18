@@ -1,0 +1,74 @@
+=== Qué llevar al servidor (verificación certificados.relaticpanama.org) ===
+
+--- A) Lo que baja solo con GIT (en el srv) ---
+  git clone https://github.com/shidalgo0925/SGC.git
+  # o: cd SGC && git pull
+
+  Incluye:
+    deploy/certificados/     → app Flask + SQLite + nginx + systemd + import_excel_to_db.py
+    script/generar.py        → por si generás PDFs en el srv (opcional)
+    requirements.txt         → del repo raíz (SGC completo)
+
+  NO trae (correcto): Excel, plantilla PDF, certificados.db, PDFs generados.
+
+--- B) Lo que debés PASAR A MANO (scp / WinSCP / sftp) ---
+
+  1) BASE SQLITE (obligatoria para /v/{id})
+     Archivo en tu PC (si ya la generaste):
+       deploy/certificados/data/certificados.db
+     Destino en el srv (ejemplo):
+       /var/www/certificados/data/certificados.db
+
+     Si no tenés la .db: en tu PC corré
+       .venv/Scripts/python.exe deploy\certificados\import_excel_to_db.py "data\excel de datos peru.xlsx"
+     y subí el certificados.db que salga en deploy\certificados\data\
+
+  2) OPCIONAL: si no usás la .db y preferís generar en el srv
+     Subir Excel + ejecutar ahí import_excel_to_db.py (ver DESPLIEGUE.txt).
+
+--- C) Estructura recomendada en el servidor ---
+
+  /var/www/certificados/
+    app/              (desde deploy/certificados/app/)
+    data/
+      certificados.db   ← la que subís vos
+    venv/
+    requirements.txt    (copiar deploy/certificados/requirements.txt aquí)
+    import_excel_to_db.py
+
+  O clonás todo SGC y trabajás desde
+    ~/SGC/deploy/certificados/
+  ajustando rutas en systemd/nginx.
+
+--- D) Pasos mínimos en el srv (resumen) ---
+
+  1. git pull (o copiar carpeta deploy/certificados)
+  2. Subir certificados.db → .../data/
+  3. cd /var/www/certificados
+     python3 -m venv venv
+     source venv/bin/activate
+     pip install -r requirements.txt
+  4. Probar:  ACTIVIDAD_TXT="..." venv/bin/python app/app.py
+     curl http://127.0.0.1:8000/v/1
+  5. Gunicorn + systemd (archivo gunicorn-certificados.service → editar rutas y User)
+  6. Nginx (nginx-certificados.conf) → sites-enabled, reload
+  7. Cloudflare: certificados.relaticpanama.org proxy + SSL Full
+
+--- E) Coherencia con los PDFs ya emitidos ---
+
+  Los id en certificados.db = los id que salen en la URL del QR
+  (mismo Excel / misma numeración que al generar).
+
+  QR debe ser: https://certificados.relaticpanama.org/v/{id}
+  Si tus PDFs tienen otra URL, reemitir con generar.py -u ...
+
+--- F) Checklist rápido ---
+
+  [ ] git pull en srv
+  [ ] certificados.db en data/
+  [ ] venv + pip install -r requirements.txt (deploy/certificados)
+  [ ] curl localhost /v/1 OK
+  [ ] gunicorn + nginx
+  [ ] https://certificados.relaticpanama.org/v/1 en navegador/celular
+
+Detalle extra: deploy/certificados/DESPLIEGUE.txt

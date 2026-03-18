@@ -1,0 +1,49 @@
+=== certificados.relaticpanama.org (34.66.214.83) ===
+
+Estructura en el servidor:
+  /var/www/certificados/
+    app/app.py
+    app/templates/
+    data/certificados.db
+    venv/
+    import_excel_to_db.py
+    requirements.txt
+
+1) Subir carpeta deploy/certificados/ → /var/www/certificados/ (scp/rsync/git).
+
+2) Python
+   cd /var/www/certificados
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+
+3) Base de datos
+   OPCIÓN A (recomendada): en tu PC ya generaste data/certificados.db con:
+     python import_excel_to_db.py ruta/al/excel.xlsx
+   Sube solo el archivo al servidor:
+     scp data/certificados.db usuario@srv:/var/www/certificados/data/
+   OPCIÓN B: en el servidor, subir Excel y ejecutar import_excel_to_db.py ahí.
+   Los id en la DB deben coincidir con los id del QR en cada PDF.
+
+4) Probar
+   venv/bin/python app/app.py
+   curl http://127.0.0.1:8000/v/1
+
+5) Producción
+   sudo cp gunicorn-certificados.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable gunicorn-certificados
+   sudo systemctl start gunicorn-certificados
+
+6) Nginx
+   sudo cp nginx-certificados.conf /etc/nginx/sites-available/certificados
+   sudo ln -sf /etc/nginx/sites-available/certificados /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+
+7) Cloudflare: proxy ON, SSL Full (strict).
+
+8) Certificados PDF (en tu PC)
+   python script/generar.py -u https://certificados.relaticpanama.org/v
+
+⚠ No cambiar ids en Excel/DB después de emitir QR sin reemitir PDFs.
+⚠ ACTIVIDAD_TXT: editar en el .service o variable de entorno.

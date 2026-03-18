@@ -4,13 +4,13 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# PDFs generados
+# PDFs generados (no subir salidas del lote)
 output/**/*.pdf
 
-# Datos personales (no subir listas)
+# Datos y plantilla (no al repo; solo funcionalidad)
 data/*.xlsx
 data/*.xls
-data/*.XLSX
-
-# Plantilla oficial (sustituir en cada entorno; opcional quitar esta línea si quieren versionarla)
 base/*.pdf
+
+data/~$*
+**/~$*

@@ -48,22 +48,18 @@ def slug_filename(nombre: str) -> str:
     return f"CERTIFICADO_{s}.pdf"
 
 
-def _sgc_base_dir(root: str) -> str:
-    """Carpeta hermana SGC_Base (mismo padre que la carpeta del proyecto SGC)."""
-    return os.path.join(os.path.dirname(root), "SGC_Base")
-
-
 def resolve_base_pdf(root: str) -> str:
-    sgc = _sgc_base_dir(root)
-    for name in ("Certificado.pdf", "certificado.pdf", "CERTIFICADO.PDF"):
-        p = os.path.join(sgc, name)
-        if os.path.isfile(p):
-            return p
+    """Plantilla: primero SGC/base/; si no, carpeta hermana SGC_Base (legacy)."""
     for name in ("Certificado.pdf", "certificado.pdf", "CERTIFICADO.PDF"):
         p = os.path.join(root, "base", name)
         if os.path.isfile(p):
             return p
-    return os.path.join(sgc, "Certificado.pdf")
+    legacy = os.path.join(os.path.dirname(root), "SGC_Base")
+    for name in ("Certificado.pdf", "certificado.pdf", "CERTIFICADO.PDF"):
+        p = os.path.join(legacy, name)
+        if os.path.isfile(p):
+            return p
+    return os.path.join(root, "base", "Certificado.pdf")
 
 
 def _data_spreadsheets(data_dir: str) -> list[str]:
@@ -81,29 +77,29 @@ def _data_spreadsheets(data_dir: str) -> list[str]:
 
 
 def resolve_excel_path(root: str) -> str:
-    sgc = _sgc_base_dir(root)
-    for name in ("excel de datos peru.xlsx", "excel de datos peru.XLSX", "excel de datos peru.xls"):
-        p = os.path.join(sgc, name)
-        if os.path.isfile(p):
-            return p
-    for rel in (
-        os.path.join("data", "excel de datos peru.xlsx"),
-        os.path.join("data", "excel de datos peru.XLSX"),
-        os.path.join("data", "excel de datos peru.xls"),
-        os.path.join("data", "participantes.xlsx"),
-    ):
-        p = os.path.join(root, rel)
-        if os.path.isfile(p):
-            return p
+    """Excel: primero SGC/data/; si no, SGC_Base (legacy)."""
     data_dir = os.path.join(root, "data")
+    for name in (
+        "excel de datos peru.xlsx",
+        "excel de datos peru.XLSX",
+        "excel de datos peru.xls",
+        "participantes.xlsx",
+    ):
+        p = os.path.join(data_dir, name)
+        if os.path.isfile(p):
+            return p
     files = _data_spreadsheets(data_dir)
-    if not files:
-        return os.path.join(root, "data", "excel de datos peru.xlsx")
-    # Preferir .xlsx si hay varios
-    xlsx = sorted(f for f in files if f.lower().endswith(".xlsx"))
-    if xlsx:
-        return os.path.join(data_dir, xlsx[0])
-    return os.path.join(data_dir, sorted(files)[0])
+    if files:
+        xlsx = sorted(f for f in files if f.lower().endswith(".xlsx"))
+        if xlsx:
+            return os.path.join(data_dir, xlsx[0])
+        return os.path.join(data_dir, sorted(files)[0])
+    legacy = os.path.join(os.path.dirname(root), "SGC_Base")
+    for name in ("excel de datos peru.xlsx", "excel de datos peru.XLSX", "excel de datos peru.xls"):
+        p = os.path.join(legacy, name)
+        if os.path.isfile(p):
+            return p
+    return os.path.join(data_dir, "excel de datos peru.xlsx")
 
 
 def read_excel_any(path: str) -> pd.DataFrame:
@@ -287,6 +283,26 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
             f"  Columnas en el Excel: {list(df.columns)}\n"
             f"  Faltante: {', '.join(missing)}"
         )
+    email_c = pick(
+        ["email", "correo", "correo electrónico", "correo electronico", "e-mail", "mail"]
+    )
+    orcid_c = pick(["orcid", "id orcid"])
+    if not email_c:
+        for c in df.columns:
+            if c in (id_c, nom_c, cip_c):
+                continue
+            cn = col_norm_name(c)
+            if any(k in cn for k in ("correo", "email", "e-mail", "mail")):
+                email_c = c
+                break
+    if not orcid_c:
+        for c in df.columns:
+            if c in (id_c, nom_c, cip_c):
+                continue
+            if "orcid" in col_norm_name(c):
+                orcid_c = c
+                break
+
     if id_c:
         out = df[[id_c, nom_c, cip_c]].copy()
         out.columns = ["id", "nombre", "cip"]
@@ -294,6 +310,14 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         out = df[[nom_c, cip_c]].copy()
         out.insert(0, "id", range(1, len(out) + 1))
         out.columns = ["id", "nombre", "cip"]
+    if email_c:
+        out["email"] = df.loc[out.index, email_c].astype(str).replace("nan", "").replace("None", "")
+    else:
+        out["email"] = ""
+    if orcid_c:
+        out["orcid"] = df.loc[out.index, orcid_c].astype(str).replace("nan", "").replace("None", "")
+    else:
+        out["orcid"] = ""
     return out
 
 
@@ -396,11 +420,11 @@ def main():
 
     if not os.path.isfile(base_pdf):
         print(f"ERROR: No existe PDF base: {base_pdf}", file=sys.stderr)
-        print("Esperado: …\\Relatic\\SGC_Base\\Certificado.pdf (o -b ruta)", file=sys.stderr)
+        print("Esperado: SGC/base/Certificado.pdf (o -b ruta)", file=sys.stderr)
         sys.exit(1)
     if not os.path.isfile(excel_path):
         print(f"ERROR: No existe Excel: {excel_path}", file=sys.stderr)
-        print("Esperado: …\\Relatic\\SGC_Base\\excel de datos peru.xlsx (o -e ruta)", file=sys.stderr)
+        print("Esperado: SGC/data/excel de datos peru.xlsx (o -e ruta)", file=sys.stderr)
         sys.exit(1)
     if not sin_qr and not HAS_QR:
         print("ERROR: Sin --sin-qr hace falta QR. pip install 'qrcode[pil]' Pillow", file=sys.stderr)

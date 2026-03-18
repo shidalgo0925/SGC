@@ -1,0 +1,7 @@
+# Texto bajo el ícono de verificación (editar según actividad / convenio)
+actividad: >-
+  Gestión Editorial en Revistas Científicas, producto del convenio vigente
+  No. 100-001 del 20 de octubre de 2025 entre la UMLA y Relatic Panamá
+
+# Ruta al Excel (vacío = misma lógica que generar.py: SGC/data/…)
+excel_path: ""

@@ -1,38 +1,11 @@
 === SGC en servidor Relatic ===
 
-ESTRUCTURA (igual que en tu PC; el script busca ../SGC_Base/)
-  /ruta/apps/
-    SGC/              ← repo (código, sin .venv en git)
-    SGC_Base/         ← NO va al git si tiene datos personales
-      Certificado.pdf
-      excel de datos peru.xlsx
+Todo en una carpeta SGC:
+  SGC/base/Certificado.pdf
+  SGC/data/excel de datos peru.xlsx   (u otro .xlsx)
 
-1) SUBIR CÓDIGO (elige una)
-   Git (recomendado):
-     En el srv: git clone <repo-privado-relatic> && cd SGC && bash script/setup_srv.sh
-   O desde tu PC (rsync, ejemplo Linux en srv):
-     rsync -avz --exclude '.venv' --exclude '__pycache__' --exclude 'output/' \
-       ./SGC/ usuario@srv.relatic:/opt/relatic-sgc/SGC/
-     scp -r SGC_Base usuario@srv.relatic:/opt/relatic-sgc/   (solo cuando toque emitir)
+1) git clone git@github.com:shidalgo0925/SGC.git && cd SGC
+2) bash script/setup_srv.sh
+3) .venv/bin/python script/generar.py
 
-2) PRIMERA VEZ EN EL SRV (Linux)
-   cd /opt/relatic-sgc/SGC
-   bash script/setup_srv.sh
-   # Crea .venv e instala requirements.txt
-
-3) EJECUTAR EMISIÓN EN EL SRV
-   cd /opt/relatic-sgc/SGC
-   .venv/bin/python script/generar.py
-   # PDFs en SGC/output/certificados_generados/
-   Prueba 1 fila: .venv/bin/python script/generar.py -n 1
-   Sin QR (calibrar texto): .venv/bin/python script/generar.py --cert1
-
-4) SEGURIDAD
-   - Excel y PDFs con DNI: permisos restrictivos (chmod 600), borrar cuando no hagan falta.
-   - No commitear SGC_Base con listas reales al repo público.
-
-5) SI EL SRV ES WINDOWS
-   Igual que en tu máquina: py -3 -m venv .venv, pip install -r requirements.txt, emitir_peru.bat
-
-6) PYTHON EN LINUX
-   Necesario: python3 y venv (ej. Ubuntu: sudo apt install python3-venv python3-pip)
+Clonar ya trae plantilla y Excel si están commiteados en el repo.

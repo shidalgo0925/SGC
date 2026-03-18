@@ -1,0 +1,2 @@
+Coloca aquí el Excel de participantes (ej. excel de datos peru.xlsx).
+Luego: git add data/*.xlsx && git commit && git push

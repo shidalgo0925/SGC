@@ -23,9 +23,8 @@
    bash script/setup_srv.sh
    # O: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
-4) Datos que NO vienen del git (copiarlos aparte al srv)
-   - Carpeta hermana SGC_Base: Certificado.pdf + excel de datos peru.xlsx
-   - O subir por scp/sftp solo cuando vayas a emitir
+4) Datos dentro de SGC (base/ + data/): git add, commit, push.
+   Repo público = cuidado con DNI en el Excel (mejor privado).
 
 5) Token / SSH
    - HTTPS: GitHub pide Personal Access Token como contraseña

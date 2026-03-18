@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verificación</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0; padding: 1.25rem; background: #fafafa; color: #1a1a1a;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 420px; margin: 0 auto; }
+    .icon-ok {
+      width: 72px; height: 72px; margin: 0.5rem auto 1rem;
+      background: #2e7d32; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .icon-ok svg { width: 40px; height: 40px; fill: #fff; }
+    .msg {
+      text-align: center; color: #1b5e20; font-size: 0.95rem;
+      line-height: 1.45; margin-bottom: 1.25rem; padding: 0 0.25rem;
+    }
+    hr { border: none; border-top: 1px solid #e0e0e0; margin: 1.25rem 0; }
+    .field { margin-bottom: 1.1rem; }
+    .field label {
+      display: block; font-size: 0.68rem; letter-spacing: 0.04em;
+      color: #757575; text-transform: uppercase; margin-bottom: 0.25rem;
+    }
+    .field .val { font-size: 1.05rem; font-weight: 700; color: #000; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="icon-ok" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    </div>
+    <p class="msg">
+      Sus datos han sido verificados satisfactoriamente en la actividad:
+      <strong>{{ actividad }}</strong>
+    </p>
+    <hr>
+    <div class="field">
+      <label>Nombre completo</label>
+      <div class="val">{{ nombre }}</div>
+    </div>
+    <div class="field">
+      <label>DNI / ID</label>
+      <div class="val">{{ dni }}</div>
+    </div>
+    <div class="field">
+      <label>Correo electrónico</label>
+      <div class="val">{{ email }}</div>
+    </div>
+    <div class="field">
+      <label>ORCID</label>
+      <div class="val">{{ orcid }}</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+1) pip install -r requirements.txt
+2) Editar verificacion/config.yaml (texto de la actividad / convenio).
+3) Excel: columnas opcionales "correo"/"email" y "orcid" (si no hay, se muestra —).
+4) Arrancar:  .venv/Scripts/python.exe verificacion/app.py
+   Probar: http://localhost:5000/v/1  (el número = id de fila en el Excel)
+5) Publicar en internet con HTTPS (nginx + gunicorn o similar).
+6) Regenerar certificados con URL del QR:
+   .venv/Scripts/python.exe script/generar.py -u https://TU-DOMINIO/v
+   (sin barra final; el QR queda …/v/123)

@@ -1,37 +1,23 @@
-=== Pasar SGC a tu PC (Windows) ===
+=== Pasar SGC a tu PC / servidor ===
 
-1) Copia la carpeta SGC completa (o el archivo SGC_portable.tar.gz y descomprime).
+1) git clone … o copia la carpeta SGC.
 
-2) Abre CMD o PowerShell DENTRO de la carpeta SGC (Git Bash: ver nota abajo):
+2) Python:
    python -m venv .venv
    .venv\Scripts\activate
    pip install -r requirements.txt
 
-3) Archivos de emisión (junto a la carpeta SGC):
-   ..\SGC_Base\Certificado.pdf
-   ..\SGC_Base\excel de datos peru.xlsx
-   (QR obligatorio en cada PDF; sin subir nada. Sin -u el QR es texto local id/cip/nombre.)
+3) Datos DENTRO de SGC (van al repo si haces git add):
+   base\Certificado.pdf
+   data\excel de datos peru.xlsx   (o cualquier .xlsx en data/)
 
-4) Ejecuta:
+4) Emitir:
    emitir_peru.bat
    o: python script\generar.py
 
-5) Los PDFs salen en: output\certificados_generados\
+5) Salida: output\certificados_generados\
 
-6) Ajusta posición nombre/CIP en script\generar.py (CONFIG).
+6) Ajustar posición en script\generar.py (CONFIG).
 
-Opciones (ejemplos):
-  python script\generar.py -b base\mi_plantilla.pdf -e data\lista.xlsx -o output\mi_lote
-  python script\generar.py --qr-base-url https://ejemplo.com/verificacion
-  python script\generar.py -n 1
-
-Checklist: venv + deps -> PDF + Excel -> calibrar CONFIG -> lote 100+ filas -> documentar coordenadas finales.
-Sin Python en Git Bash:   bash instalar_python_gitbash.sh
-  (usa winget, o descarga el instalador oficial a Descargas y lo ejecuta en silencio)
-
-Git Bash en Windows: el comando "python" a menudo apunta a la Tienda (falla).
-  - Crear venv con: py -3 -m venv .venv
-  - Luego: ./emitir_cert1.sh   (usa .venv\Scripts\python.exe)
-  - O ejecutar emitir_cert1.bat desde CMD.
-
-Detalle técnico: README_PROGRAMADOR.md
+Git Bash: ver GITHUB_SSH.txt / push_github.sh
+Si el repo es público, el Excel puede exponer DNI — valorar repo privado.

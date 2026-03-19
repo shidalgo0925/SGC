@@ -1,0 +1,21 @@
+# Si la app vive en ~/SGC/deploy/certificados (DB en data/certificados.db):
+#   sudo cp gunicorn-certificados-SGC-home.service /etc/systemd/system/gunicorn-certificados.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now gunicorn-certificados
+
+[Unit]
+Description=Gunicorn verificación certificados (SGC home)
+After=network.target
+
+[Service]
+User=relaticpanama2025
+Group=relaticpanama2025
+WorkingDirectory=/home/relaticpanama2025/SGC/deploy/certificados
+Environment="PATH=/home/relaticpanama2025/SGC/deploy/certificados/venv/bin"
+Environment="ACTIVIDAD_TXT=Gestión Editorial en Revistas Científicas, producto del convenio vigente No. 100-001 del 20 de octubre de 2025 entre la UMLA y Relatic Panamá."
+ExecStart=/home/relaticpanama2025/SGC/deploy/certificados/venv/bin/gunicorn -w 2 -b 127.0.0.1:8000 app.app:app
+
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

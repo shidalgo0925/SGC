@@ -10,6 +10,8 @@ import io
 import os
 import re
 import sys
+import webbrowser
+from pathlib import Path
 import pandas as pd
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.lib.utils import ImageReader
@@ -409,6 +411,12 @@ def main():
         action="store_true",
         help="Primera fila → output/cert1.pdf, sin QR.",
     )
+    ap.add_argument(
+        "--no-browser",
+        action="store_true",
+        dest="no_browser",
+        help="No abrir el PDF en el navegador al terminar.",
+    )
     args = ap.parse_args()
 
     if args.cert1:
@@ -449,6 +457,7 @@ def main():
 
     ok = 0
     errs = []
+    first_pdf_path = None
     for idx, row in df.iterrows():
         try:
             rid = row["id"]
@@ -478,6 +487,8 @@ def main():
             with open(out_path, "wb") as f:
                 writer.write(f)
             ok += 1
+            if first_pdf_path is None:
+                first_pdf_path = out_path
         except Exception as e:
             errs.append((idx, str(e)))
 
@@ -493,6 +504,19 @@ def main():
             print(f"  fila {i}: {msg}", file=sys.stderr)
         if len(errs) > 20:
             print(f"  ... y {len(errs) - 20} más", file=sys.stderr)
+
+    if ok > 0 and not args.no_browser:
+        to_open = (
+            os.path.join(root, "output", "cert1.pdf")
+            if args.cert1
+            else first_pdf_path
+        )
+        if to_open and os.path.isfile(to_open):
+            try:
+                webbrowser.open(Path(os.path.abspath(to_open)).as_uri())
+                print(f"Navegador: {to_open}")
+            except Exception as e:
+                print(f"Aviso: no se pudo abrir en navegador ({e})", file=sys.stderr)
 
 
 if __name__ == "__main__":
